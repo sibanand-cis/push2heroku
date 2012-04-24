@@ -46,6 +46,7 @@ module Push2heroku
 
       build_config_commands
 
+      commands << "heroku pg:reset  SHARED_DATABASE_URL --app #{subdomain} --confirm #{subdomain} --trace"
       commands << "heroku run rake db:migrate --app #{subdomain} --trace"
       commands << "heroku run rake setup --app #{subdomain} --trace"
       commands << "heroku open --app #{subdomain}"
