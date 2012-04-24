@@ -50,12 +50,15 @@ module Push2heroku
       commands << "heroku run rake db:migrate --app #{subdomain} --trace"
       commands << "heroku run rake setup --app #{subdomain} --trace"
       commands << "heroku open --app #{subdomain}"
+      puts "*"*20 + 'DONE' + '*'*20
     end
 
     def build_config_commands
+      cmd = []
       settings.config.each do |key, value|
-        commands << "heroku config:add #{key.upcase}=#{value} --app #{subdomain}"
+        cmd << "#{key.upcase}=#{value}"
       end
+     commands << "heroku config:add #{cmd.join(' ')} --app #{subdomain}"
     end
 
   end
