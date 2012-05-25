@@ -41,15 +41,15 @@ module Push2heroku
     end
 
     def build_commands
-      commands << "heroku create #{subdomain} --stack cedar --remote h#{branch_name}"
+      commands << "bundle exec heroku create #{subdomain} --stack cedar --remote h#{branch_name}"
       commands << "git push h#{branch_name} #{branch_name}:master -f "
 
       build_config_commands
 
-      commands << "heroku pg:reset  SHARED_DATABASE_URL --app #{subdomain} --confirm #{subdomain} --trace"
-      commands << "heroku run rake db:migrate --app #{subdomain} --trace"
-      commands << "heroku run rake setup --app #{subdomain} --trace"
-      commands << "heroku open --app #{subdomain}"
+      commands << "bundle exec heroku pg:reset  SHARED_DATABASE_URL --app #{subdomain} --confirm #{subdomain} --trace"
+      commands << "bundle exec heroku run rake db:migrate --app #{subdomain} --trace"
+      commands << "bundle exec heroku run rake setup --app #{subdomain} --trace"
+      commands << "bundle exec heroku open --app #{subdomain}"
       puts "*"*20 + 'DONE' + '*'*20
     end
 
@@ -58,7 +58,7 @@ module Push2heroku
       settings.config.each do |key, value|
         cmd << "#{key.upcase}=#{value}"
       end
-     commands << "heroku config:add #{cmd.join(' ')} --app #{subdomain}"
+     commands << "bundle exec heroku config:add #{cmd.join(' ')} --app #{subdomain}"
     end
 
   end
