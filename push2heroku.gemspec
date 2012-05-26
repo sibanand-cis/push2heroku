@@ -16,5 +16,5 @@ Gem::Specification.new do |gem|
   gem.version       = Push2heroku::VERSION
 
   gem.add_dependency("hashr", "= 0.0.19")
-  gem.add_dependency("heroku")
+  gem.add_dependency("heroku", "= 2.25.0")
 end
