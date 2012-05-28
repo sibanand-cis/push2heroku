@@ -18,7 +18,7 @@ module Push2heroku
 
     def push
       build_commands
-      puts "------> httpp://#{subdomain}.herokuapp.com"
+      puts "------> http://#{subdomain}.herokuapp.com"
       commands.each { |cmd| puts "*  " + cmd }
       commands.each do |cmd|
         begin
