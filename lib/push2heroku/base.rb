@@ -18,7 +18,8 @@ module Push2heroku
 
     def push
       build_commands
-      commands.each { |cmd| puts ">"*20 + cmd }
+      puts "------> httpp://#{subdomain}.herokuapp.com"
+      commands.each { |cmd| puts "*  " + cmd }
       commands.each do |cmd|
         begin
           sh cmd
@@ -50,7 +51,6 @@ module Push2heroku
       commands << "bundle exec heroku run rake db:migrate --app #{subdomain} --trace"
       commands << "bundle exec heroku run rake setup --app #{subdomain} --trace"
       commands << "bundle exec heroku open --app #{subdomain}"
-      puts "*"*20 + 'DONE' + '*'*20
     end
 
     def build_config_commands
