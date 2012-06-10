@@ -38,7 +38,7 @@ module Push2heroku
     end
 
     def url_prefix
-      settings.app_name.gsub(/[^0-9a-zA-Z]+/,'-').downcase
+      settings.app_name.gsub(/[^0-9a-zA-Z]+/,'-').downcase[0..29] #heroku only allows upto 30 characters in name
     end
 
     def build_commands
