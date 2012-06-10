@@ -9,7 +9,7 @@ module Push2heroku
       @current_user = git.current_user
       @settings = ConfigLoader.new('push2heroku.yml').load(branch_name)
       @commands = []
-      @subdomain = "#{url_prefix}-#{url_suffix}".downcase.chomp('-')
+      @subdomain = "#{url_prefix}-#{url_suffix}".downcase.chomp('-')[0..29] #heroku only allows upto 30 characters in name
     end
 
     def self.process
@@ -38,7 +38,7 @@ module Push2heroku
     end
 
     def url_prefix
-      settings.app_name.gsub(/[^0-9a-zA-Z]+/,'-').downcase[0..29] #heroku only allows upto 30 characters in name
+      settings.app_name.gsub(/[^0-9a-zA-Z]+/,'-').downcase
     end
 
     def build_commands
