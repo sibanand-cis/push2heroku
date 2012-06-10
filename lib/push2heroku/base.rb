@@ -54,7 +54,7 @@ module Push2heroku
     end
 
     def build_config_commands
-      return unless Settings.config
+      return unless settings.config
       cmd = []
       settings.config.each do |key, value|
         cmd << "#{key.upcase}=#{value}"
