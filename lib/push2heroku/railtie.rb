@@ -4,7 +4,8 @@ module Push2heroku
     rake_tasks do
       desc "pushes to heroku"
       task :push2heroku => :environment do
-        Base.process
+        hard = ENV['HARD']
+        Base.new(hard).push
       end
     end
 

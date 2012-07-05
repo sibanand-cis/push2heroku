@@ -2,18 +2,16 @@ module Push2heroku
   class Base
 
     attr_accessor :branch_name, :commands, :current_user, :subdomain, :settings
+    attr_reader :hard
 
-    def initialize
+    def initialize(hard)
+      @hard = hard.blank? ? false : true
       git = Git.new
       @branch_name = git.current_branch
       @current_user = git.current_user
       @settings = ConfigLoader.new('push2heroku.yml').load(branch_name)
       @commands = []
       @subdomain = "#{url_prefix}-#{url_suffix}".downcase.chomp('-')[0..29] #heroku only allows upto 30 characters in name
-    end
-
-    def self.process
-      new.push
     end
 
     def push
@@ -47,11 +45,19 @@ module Push2heroku
 
       build_config_commands
 
-      commands << "bundle exec heroku pg:reset  SHARED_DATABASE_URL --app #{subdomain} --confirm #{subdomain} --trace"
+      if Util.hard_push?(self)
+        commands << "bundle exec heroku pg:reset  SHARED_DATABASE_URL --app #{subdomain} --confirm #{subdomain} --trace"
+      end
+
       commands << "bundle exec heroku run rake db:migrate --app #{subdomain} --trace"
-      commands << "bundle exec heroku run rake setup --app #{subdomain} --trace"
+
+      if Util.hard_push?(self)
+        commands << "bundle exec heroku run rake setup --app #{subdomain} --trace"
+      end
+
       commands << "bundle exec heroku open --app #{subdomain}"
     end
+
 
     def build_config_commands
       return unless settings.config

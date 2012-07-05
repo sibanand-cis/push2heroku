@@ -7,6 +7,7 @@ module Push2heroku
   autoload :Base
   autoload :ConfigLoader
   autoload :Git
+  autoload :Util
 end
 
 require 'push2heroku/railtie'
