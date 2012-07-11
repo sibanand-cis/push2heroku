@@ -1,35 +1,47 @@
 # Push2heroku
 
-Push to heroku.
+Makes it easy to push to heroku.
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Add this to Gemfile:
 
     gem 'push2heroku'
 
-And then execute:
-
-    $ bundle
-
 ## Usage
 
-First copy `push2heroku.yml` from [here]().
+After installing the gem execute
 
-`rake push2heroku`
+`rake push2heroku:install`
 
-push2heroku uses `cedar` stack which has now become the default stack
-for Heroku.
+It will put `push2heroku.yml` file in the `config` folder of your
+application.
 
-If `push2heroku` detects that it is a new branch and it has never been
-pushed to heroku before then it will do the whole thing including
-resetting the database and then running `rake setup`.
+## Here is how it works
 
-If `push2heroku` detects that a branch is already deployed then it will
-do only two things
+`push2heroku` reads the `push2heroku.yml` and executes those commands.
+It's that simple.
 
-- it will push the new content to heroku
-- it will execute `rake db:migrate`
+Lets say that I am working in a branch called
+`76-facebook-authentication`. When I execute `push2heroku` then the
+application name under which it will be deployed to heroku will be
+`nimbleshop-76-facebook-neeraj`.
+
+`nimbleshop` is the name of the application.
+`76-facebook` is the first 10 letters of the branch name.
+`neeraj` is the first 5 letters of my github user name.
+
+So in this case the url of the application will be
+`http://nimbleshop-76-facebook-neeraj.herokuapp.com` .
+
+In the push2heroku.yml file the keys `production`, `staging` and `lab`
+are branch names. And these branches are special branches. For these
+branches the url generated will be just the application name and the
+branch name. For example if I execute `rake push2heroku` from `staging`
+branch then the heroku url will be
+`http://nimbleshop-staging.herokuapp.com`.
+
+
 
 If you want to reset the whole thing then you can force `push2heroku`
 into running everything like this

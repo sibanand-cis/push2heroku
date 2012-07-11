@@ -9,6 +9,9 @@ module Push2heroku
       git = Git.new
       @branch_name = git.current_branch
       @current_user = git.current_user
+
+      ENV['BRANCH_NAME'] = branch_name
+      ENV['HEROKU_APP_NAME'] = 'tweli'
       @named_branches, @settings = ConfigLoader.new('push2heroku.yml').load(branch_name)
 
       @commands = []
@@ -41,22 +44,18 @@ module Push2heroku
     end
 
     def build_commands
-      commands << "bundle exec heroku create #{subdomain} --stack cedar --remote h#{branch_name}"
-      commands << "git push h#{branch_name} #{branch_name}:master -f "
+      commands << settings.pre_config_commands
 
       build_config_commands
 
       if Util.hard_push?(self)
-        commands << "bundle exec heroku pg:reset  SHARED_DATABASE_URL --app #{subdomain} --confirm #{subdomain} --trace"
-      end
-
-      commands << "bundle exec heroku run rake db:migrate --app #{subdomain} --trace"
-
-      if Util.hard_push?(self)
-        commands << "bundle exec heroku run rake setup --app #{subdomain} --trace"
+        commands << settings.post_config_commands.hard
+      else
+        commands << settings.post_config_commands.soft
       end
 
       commands << "bundle exec heroku open --app #{subdomain}"
+      commands.flatten!
     end
 
 
