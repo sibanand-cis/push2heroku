@@ -9,6 +9,13 @@ module Push2heroku
 
     def load(key)
       file            = Rails.root.join('config', filename)
+
+      unless File.exists? file
+        puts "you do not have config/push2heroku.yml file. Please execute "
+        puts "rails generate push2heroku:install"
+        abort
+      end
+
       hash            = YAML.load(ERB.new(File.read(file)).result)
 
       named_branches = hash.keys - ['common']
