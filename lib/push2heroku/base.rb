@@ -11,7 +11,7 @@ module Push2heroku
       @current_user = git.current_user
 
       ENV['BRANCH_NAME'] = branch_name
-      ENV['HEROKU_APP_NAME'] = 'tweli'
+      ENV['HEROKU_APP_NAME'] = 'nimbleshop'
       @named_branches, @settings = ConfigLoader.new('push2heroku.yml').load(branch_name)
 
       @commands = []
