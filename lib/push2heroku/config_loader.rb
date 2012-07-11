@@ -11,11 +11,15 @@ module Push2heroku
       file            = Rails.root.join('config', filename)
       hash            = YAML.load(ERB.new(File.read(file)).result)
 
+      named_branches = hash.keys - ['common']
+
       common_hash = hash['common'] || {}
       env_hash = hash[key.to_s] || {}
 
       final_hash = common_hash.deep_merge(env_hash)
-      Hashr.new(final_hash)
+      h = Hashr.new(final_hash)
+
+      [named_branches, h]
     end
   end
 end

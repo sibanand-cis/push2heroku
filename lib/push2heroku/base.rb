@@ -1,7 +1,7 @@
 module Push2heroku
   class Base
 
-    attr_accessor :branch_name, :commands, :current_user, :subdomain, :settings
+    attr_accessor :branch_name, :commands, :current_user, :subdomain, :settings, :named_branches
     attr_reader :hard
 
     def initialize(hard)
@@ -9,7 +9,8 @@ module Push2heroku
       git = Git.new
       @branch_name = git.current_branch
       @current_user = git.current_user
-      @settings = ConfigLoader.new('push2heroku.yml').load(branch_name)
+      @named_branches, @settings = ConfigLoader.new('push2heroku.yml').load(branch_name)
+
       @commands = []
       @subdomain = "#{url_prefix}-#{url_suffix}".downcase.chomp('-')[0..29] #heroku only allows upto 30 characters in name
     end
@@ -30,7 +31,7 @@ module Push2heroku
     private
 
     def url_suffix
-      return branch_name if %w(staging production).include?(branch_name)
+      return branch_name if named_branches.include?(branch_name)
 
       [branch_name[0..10], current_user[0..5]].join('-').gsub(/[^0-9a-zA-Z]+/,'-').downcase
     end
