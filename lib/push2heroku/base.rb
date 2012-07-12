@@ -1,24 +1,31 @@
 module Push2heroku
   class Base
 
-    attr_accessor :branch_name, :commands, :current_user, :subdomain, :settings, :named_branches
-    attr_reader :hard
+    attr_accessor :branch_name, :commands, :current_user, :heroku_app_name, :settings, :named_branches
+    attr_reader :hard, :project_name
 
     def initialize(hard)
+      @project_name = File.basename(Dir.getwd)
       @hard = hard.blank? ? false : true
+
       git = Git.new
       @branch_name = git.current_branch
       @current_user = git.current_user
-      @named_branches, @settings = ConfigLoader.new('push2heroku.yml').load(branch_name)
+
+      @named_branches = ConfigLoader.new('push2heroku.yml').named_branches
+
+      @heroku_app_name = "#{url_prefix}-#{url_suffix}".downcase.chomp('-')[0..29] #heroku only allows upto 30 characters in name
+
+      ENV['BRANCH_NAME'] = branch_name
+      ENV['HEROKU_APP_NAME'] = heroku_app_name
+      @settings = ConfigLoader.new('push2heroku.yml').settings(branch_name)
 
       @commands = []
-      @subdomain = "#{url_prefix}-#{url_suffix}".downcase.chomp('-')[0..29] #heroku only allows upto 30 characters in name
     end
 
     def push
       build_commands
-      puts "------> http://#{subdomain}.herokuapp.com"
-      commands.each { |cmd| puts "*  " + cmd }
+      feedback_to_user
       commands.each do |cmd|
         begin
           sh cmd
@@ -37,28 +44,16 @@ module Push2heroku
     end
 
     def url_prefix
-      settings.app_name.gsub(/[^0-9a-zA-Z]+/,'-').downcase
+      project_name.gsub(/[^0-9a-zA-Z]+/,'-').downcase
     end
 
     def build_commands
-      commands << "bundle exec heroku create #{subdomain} --stack cedar --remote h#{branch_name}"
-      commands << "git push h#{branch_name} #{branch_name}:master -f "
-
+      commands << settings.pre_config_commands
       build_config_commands
-
-      if Util.hard_push?(self)
-        commands << "bundle exec heroku pg:reset  SHARED_DATABASE_URL --app #{subdomain} --confirm #{subdomain} --trace"
-      end
-
-      commands << "bundle exec heroku run rake db:migrate --app #{subdomain} --trace"
-
-      if Util.hard_push?(self)
-        commands << "bundle exec heroku run rake setup --app #{subdomain} --trace"
-      end
-
-      commands << "bundle exec heroku open --app #{subdomain}"
+      commands << ( Util.hard_push?(self) ?  settings.post_config_commands.hard : settings.post_config_commands.soft )
+      commands << "bundle exec heroku open --app #{heroku_app_name}"
+      commands.flatten!
     end
-
 
     def build_config_commands
       return unless settings.config
@@ -66,8 +61,23 @@ module Push2heroku
       settings.config.each do |key, value|
         cmd << "#{key.upcase}=#{value}"
       end
-     commands << "bundle exec heroku config:add #{cmd.join(' ')} --app #{subdomain}"
+     commands << "bundle exec heroku config:add #{cmd.join(' ')} --app #{heroku_app_name}"
     end
 
+    def feedback_to_user
+      puts '='*50
+      puts 'The application will be deployed at:'
+      puts "http://#{heroku_app_name}.herokuapp.com"
+      puts '='*50
+      puts ''
+      puts '='*50
+      puts 'Following commands will be executed:'
+      commands.each do |cmd|
+        puts ''
+        puts cmd
+      end
+      puts '='*50
+      puts ''
+    end
   end
 end
