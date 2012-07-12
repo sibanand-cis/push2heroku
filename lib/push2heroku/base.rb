@@ -25,8 +25,7 @@ module Push2heroku
 
     def push
       build_commands
-      puts "------> http://#{heroku_app_name}.herokuapp.com"
-      commands.each { |cmd| puts "*  " + cmd }
+      feedback_to_user
       commands.each do |cmd|
         begin
           sh cmd
@@ -65,5 +64,20 @@ module Push2heroku
      commands << "bundle exec heroku config:add #{cmd.join(' ')} --app #{heroku_app_name}"
     end
 
+    def feedback_to_user
+      puts '='*50
+      puts 'The application will be deployed at:'
+      puts "http://#{heroku_app_name}.herokuapp.com"
+      puts '='*50
+      puts ''
+      puts '='*50
+      puts 'Following commands will be executed:'
+      commands.each do |cmd|
+        puts ''
+        puts cmd
+      end
+      puts '='*50
+      puts ''
+    end
   end
 end

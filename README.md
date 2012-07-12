@@ -12,10 +12,24 @@ Add this to Gemfile:
 
 After installing the gem execute
 
-`rake push2heroku:install`
+`rails generate push2heroku:install`
 
 It will put `push2heroku.yml` file in the `config` folder of your
 application.
+
+## What problem it solves
+
+Here at BigBinary we create a separate branch for each feature we work
+on. Let's say that I am working `making authentication with facebook`.
+When I am done with the feature then I send pull request to my team
+members to review. However in order to review the work all the team
+members need to pull down the branch and fire up `rails server` and then
+review. After a change is done then do the whole thing again.
+
+We like to see things working. So we developed `push2heroku` to push a
+feature branch to heroku instantly with one command. Executing
+`push2heroku` prints a url and we put that url in the pull request so
+that team members can actually test the featurer.
 
 ## Here is how it works
 
@@ -27,29 +41,29 @@ Lets say that I am working in a branch called
 application name under which it will be deployed to heroku will be
 `nimbleshop-76-facebook-neeraj`.
 
-`nimbleshop` is the name of the application.
+`nimbleshop` is the name of the project.
 `76-facebook` is the first 10 letters of the branch name.
 `neeraj` is the first 5 letters of my github user name.
 
 So in this case the url of the application will be
 `http://nimbleshop-76-facebook-neeraj.herokuapp.com` .
 
-In the push2heroku.yml file the keys `production`, `staging` and `lab`
+In the push2heroku.yml file the keys `production` and `staging`
 are branch names. And these branches are special branches. For these
 branches the url generated will be just the application name and the
 branch name. For example if I execute `rake push2heroku` from `staging`
 branch then the heroku url will be
 `http://nimbleshop-staging.herokuapp.com`.
 
+## Resetting the database
 
+When the application is deployed for the very first time then you want
+the database to reset and some sort of setup to be run. However on
+subsequest deployment you do not need to run those setup tasks.
 
-If you want to reset the whole thing then you can force `push2heroku`
-into running everything like this
+To incorporate that on first deployment `push2heroku` will execute
+commands mentioned under key `hard`. Here `hard` stands for hard push.
+Subsequent pushes will be `soft` push.
 
-`rake push2heroku HARD=true` . This will do hard push.
-
-- it will push new content to heroku
-- it will reset the database
-- it will execute `rake db:migrate`
-- it will execute `rake setup`
-
+If you want to force `hard` push anytime then execute `rake push2heroku
+HARD=true`.
