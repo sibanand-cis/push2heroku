@@ -10,12 +10,10 @@ Add this to Gemfile:
 
 ## Usage
 
-After installing the gem execute
+After installing the gem copy [this file](https://gist.github.com/3098161) to `config/push2heroku.yml` .
 
-`rails generate push2heroku:install`
-
-It will put `push2heroku.yml` file in the `config` folder of your
-application.
+Change the contents of `config/push2heroku.yml` as per your needs after
+reading rest of README.
 
 ## What problem it solves
 
