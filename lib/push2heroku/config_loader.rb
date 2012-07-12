@@ -1,13 +1,27 @@
 module Push2heroku
   class ConfigLoader
 
-    attr_reader :filename
+    attr_reader :filename, :hash
 
     def initialize(filename)
       @filename = filename
+      @hash = load_config
     end
 
-    def load(key)
+    def settings(branch_name)
+      common_hash = hash['common'] || {}
+      env_hash = hash[branch_name.to_s] || {}
+      final_hash = common_hash.deep_merge(env_hash)
+      Hashr.new(final_hash)
+    end
+
+    def named_branches
+      hash.keys - ['common']
+    end
+
+    private
+
+    def load_config
       file            = Rails.root.join('config', filename)
 
       unless File.exists? file
@@ -15,18 +29,9 @@ module Push2heroku
         puts "rails generate push2heroku:install"
         abort
       end
-
-      hash            = YAML.load(ERB.new(File.read(file)).result)
-
-      named_branches = hash.keys - ['common']
-
-      common_hash = hash['common'] || {}
-      env_hash = hash[key.to_s] || {}
-
-      final_hash = common_hash.deep_merge(env_hash)
-      h = Hashr.new(final_hash)
-
-      [named_branches, h]
+      YAML.load(ERB.new(File.read(file)).result)
     end
+
+
   end
 end

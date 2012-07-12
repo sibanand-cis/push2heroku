@@ -12,11 +12,13 @@ module Push2heroku
       @branch_name = git.current_branch
       @current_user = git.current_user
 
+      @named_branches = ConfigLoader.new('push2heroku.yml').named_branches
+
       @heroku_app_name = "#{url_prefix}-#{url_suffix}".downcase.chomp('-')[0..29] #heroku only allows upto 30 characters in name
 
       ENV['BRANCH_NAME'] = branch_name
       ENV['HEROKU_APP_NAME'] = heroku_app_name
-      @named_branches, @settings = ConfigLoader.new('push2heroku.yml').load(branch_name)
+      @settings = ConfigLoader.new('push2heroku.yml').settings(branch_name)
 
       @commands = []
     end
