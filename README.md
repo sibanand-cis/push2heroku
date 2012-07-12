@@ -10,7 +10,7 @@ Add this to Gemfile:
 
 ## Usage
 
-After installing the gem copy [this file](https://gist.github.com/3098161) to `config/push2heroku.yml` .
+After installing the gem copy [this file](https://raw.github.com/gist/3098161/578dad8cd3933834712a8afdf33520221dbdb986/push2heroku.yml) to `config/push2heroku.yml` .
 
 Change the contents of `config/push2heroku.yml` as per your needs after
 reading rest of README.
@@ -18,16 +18,16 @@ reading rest of README.
 ## What problem it solves
 
 Here at BigBinary we create a separate branch for each feature we work
-on. Let's say that I am working `making authentication with facebook`.
+on. Let's say that I am working on `authentication with facebook`.
 When I am done with the feature then I send pull request to my team
 members to review. However in order to review the work all the team
 members need to pull down the branch and fire up `rails server` and then
-review. After a change is done then do the whole thing again.
+review.
 
 We like to see things working. So we developed `push2heroku` to push a
 feature branch to heroku instantly with one command. Executing
 `push2heroku` prints a url and we put that url in the pull request so
-that team members can actually test the featurer.
+that team members can actually test the feature.
 
 ## Here is how it works
 
@@ -46,12 +46,16 @@ application name under which it will be deployed to heroku will be
 So in this case the url of the application will be
 `http://nimbleshop-76-facebook-neeraj.herokuapp.com` .
 
-In the push2heroku.yml file the keys `production` and `staging`
+In the `push2heroku.yml` file the keys `production` and `staging`
 are branch names. And these branches are special branches. For these
 branches the url generated will be just the application name and the
 branch name. For example if I execute `rake push2heroku` from `staging`
 branch then the heroku url will be
 `http://nimbleshop-staging.herokuapp.com`.
+
+However if I delete `staging` key from `push2heroku.yml` then `staging`
+is no longer a special branch and the heroku url would be
+`http://nimbleshop-staging-neeraj.herokuapp.com` .
 
 ## Resetting the database
 
@@ -65,3 +69,7 @@ Subsequent pushes will be `soft` push.
 
 If you want to force `hard` push anytime then execute `rake push2heroku
 HARD=true`.
+
+## License
+
+`push2heroku` is released under MIT License.
