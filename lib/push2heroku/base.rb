@@ -53,7 +53,7 @@ module Push2heroku
       commands << ( settings.post_config_commands.new_install if Util.new_install?(self) )
 
       add_callback_commands
-      add_after_every_instal
+      add_after_every_install
 
       commands << "bundle exec heroku open --app #{heroku_app_name}"
       commands.flatten!
