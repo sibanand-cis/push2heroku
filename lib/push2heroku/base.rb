@@ -89,7 +89,6 @@ module Push2heroku
       puts '='*50
       puts 'Following commands will be executed:'
       commands.each do |cmd|
-        puts ''
         puts cmd
       end
       puts '='*50
