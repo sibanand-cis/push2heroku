@@ -2,7 +2,10 @@ class Util
 
   def self.hard_push?(base)
     remote_branch_name = "h#{base.branch_name}"
-    base.hard || !remote_branch_exists?(remote_branch_name)
+
+    # do hard push only when expicitly asked
+    # base.hard || !remote_branch_exists?(remote_branch_name)
+    base.hard
   end
 
   def self.remote_branch_exists?(remote_branch_name)
