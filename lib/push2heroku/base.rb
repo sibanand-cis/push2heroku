@@ -2,11 +2,11 @@ module Push2heroku
   class Base
 
     attr_accessor :branch_name, :commands, :current_user, :heroku_app_name, :settings, :named_branches
-    attr_reader :hard, :project_name
+    attr_reader :callbacks, :project_name
 
-    def initialize(hard)
+    def initialize(callbacks)
       @project_name = File.basename(Dir.getwd)
-      @hard = hard.blank? ? false : true
+      @callbacks = callbacks
 
       git = Git.new
       @branch_name = git.current_branch
@@ -50,9 +50,25 @@ module Push2heroku
     def build_commands
       commands << settings.pre_config_commands
       build_config_commands
-      commands << ( Util.hard_push?(self) ?  settings.post_config_commands.hard : settings.post_config_commands.soft )
+      commands << ( settings.post_config_commands.new_install if Util.new_install?(self) )
+
+      add_callback_commands
+      add_after_every_instal
+
       commands << "bundle exec heroku open --app #{heroku_app_name}"
       commands.flatten!
+    end
+
+    def add_after_every_install
+      if cmd = settings.post_config_commands.after_every_install
+        commands << cmd
+      end
+    end
+
+    def add_callback_commands
+      callbacks.each do |callback|
+        commands << settings.post_config_commands[callback]
+      end
     end
 
     def build_config_commands
