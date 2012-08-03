@@ -50,13 +50,18 @@ module Push2heroku
     def build_commands
       commands << settings.pre_config_commands
       build_config_commands
-      commands << ( settings.post_config_commands.new_install if Util.new_install?(self) )
-
+      add_before_every_install
       add_callback_commands
       add_after_every_install
 
       commands << "bundle exec heroku open --app #{heroku_app_name}"
       commands.flatten!
+    end
+
+    def add_before_every_install
+      if cmd = settings.post_config_commands.before_every_install
+        commands << cmd
+      end
     end
 
     def add_after_every_install
