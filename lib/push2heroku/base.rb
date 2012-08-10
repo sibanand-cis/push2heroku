@@ -62,7 +62,7 @@ module Push2heroku
         commands << "bundle exec heroku open --app #{heroku_app_name}"
       end
 
-      commands.flatten!
+      commands.flatten!.compact!
     end
 
     def add_before_every_install
