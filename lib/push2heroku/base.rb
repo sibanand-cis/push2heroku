@@ -30,6 +30,7 @@ module Push2heroku
         begin
           sh cmd
         rescue Exception => e
+          puts "command that failed was: #{cmd}"
           puts e
         end
       end
