@@ -54,7 +54,12 @@ module Push2heroku
       add_callback_commands
       add_after_every_install
 
-      commands << "bundle exec heroku open --app #{heroku_app_name}"
+      if public_url = settings.public_url
+        commands << "bundle exec heroku open --app #{public_url}"
+      else
+        commands << "bundle exec heroku open --app #{heroku_app_name}"
+      end
+
       commands.flatten!
     end
 
