@@ -55,7 +55,7 @@ module Push2heroku
       add_after_every_install
 
       if public_url = settings.public_url
-        commands << "bundle exec heroku open --app #{public_url}"
+        commands << "open http://#{public_url}"
       else
         commands << "bundle exec heroku open --app #{heroku_app_name}"
       end
