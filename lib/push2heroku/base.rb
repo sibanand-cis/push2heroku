@@ -28,6 +28,7 @@ module Push2heroku
       feedback_to_user
       commands.each do |cmd|
         begin
+          puts "Going to execute: #{cmd}"
           sh cmd
         rescue Exception => e
           puts "command that failed was: #{cmd}"
