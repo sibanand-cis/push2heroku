@@ -57,18 +57,6 @@ However if I delete `staging` key from `push2heroku.yml` then `staging`
 is no longer a special branch and the heroku url would be
 `http://nimbleshop-staging-neeraj.herokuapp.com` .
 
-## Resetting the database
-
-When the application is deployed for the very first time then you want
-the database to reset and some sort of setup to be run. However on
-subsequest deployment you do not need to run those setup tasks.
-
-To incorporate that on first deployment `push2heroku` will execute
-commands mentioned under key `hard`. Here `hard` stands for hard push.
-Subsequent pushes will be `soft` push.
-
-If you want to force `hard` push anytime then execute `rake push2heroku
-HARD=true`.
 
 ## License
 
