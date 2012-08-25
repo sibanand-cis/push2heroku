@@ -24,7 +24,6 @@ module Push2heroku
     end
 
     def reload_config
-      debugger
       @config = ConfigLoader.new('push2heroku.yml')
       set_settings
     end
