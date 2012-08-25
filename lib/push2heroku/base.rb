@@ -1,34 +1,63 @@
 module Push2heroku
   class Base
 
-    attr_accessor :branch_name, :commands, :current_user, :heroku_app_name, :settings, :named_branches
-    attr_reader :callbacks, :project_name
+    attr_accessor :branch_name, :commands, :current_user, :settings, :named_branches
+    attr_reader :callbacks, :project_name, :heroku_app_name, :git, :config
 
     def initialize(callbacks)
-      @project_name = File.basename(Dir.getwd)
       @callbacks = callbacks
+      @git = Git.new
+      @commands = []
+      @config = ConfigLoader.new('push2heroku.yml')
+      after_initialize
+    end
 
-      git = Git.new
+    def after_initialize
+      set_project_name
+      set_branch_name
+      set_current_user_name
+      set_named_branches
+      set_settings
+      set_heroku_app_name
+      set_env
+      reload_config
+    end
+
+    def reload_config
+      debugger
+      @config = ConfigLoader.new('push2heroku.yml')
+      set_settings
+    end
+
+    def set_project_name
+      @project_name = File.basename(Dir.getwd)
+    end
+
+    def set_branch_name
       @branch_name = git.current_branch
+    end
+
+    def set_current_user_name
       @current_user = git.current_user
+    end
 
-      @named_branches = ConfigLoader.new('push2heroku.yml').named_branches
-      @settings = ConfigLoader.new('push2heroku.yml').settings(branch_name)
+    def set_named_branches
+      @named_branches = config.named_branches
+    end
 
+    def set_settings
+      @settings = config.settings(branch_name)
+    end
+
+    def set_heroku_app_name
       @heroku_app_name = "#{url_prefix}-#{url_suffix}".downcase.chomp('-')[0..29] #heroku only allows upto 30 characters in name
+    end
 
+    def set_env
       ENV['BRANCH_NAME'] = branch_name
       ENV['HEROKU_APP_NAME'] = heroku_app_name
       ENV['HEROKU_APP_URL'] = "http://#{heroku_app_name}.herokuapp.com"
-
-      if app_url = @settings.app_url
-        ENV['APP_URL'] =  app_url
-      else
-        ENV['APP_URL'] =  ENV['HEROKU_APP_URL']
-      end
-
-
-      @commands = []
+      ENV['APP_URL'] = @settings.app_url ? @settings.app_url : ENV['HEROKU_APP_URL']
     end
 
     def push
