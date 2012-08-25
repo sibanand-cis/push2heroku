@@ -13,12 +13,20 @@ module Push2heroku
       @current_user = git.current_user
 
       @named_branches = ConfigLoader.new('push2heroku.yml').named_branches
+      @settings = ConfigLoader.new('push2heroku.yml').settings(branch_name)
 
       @heroku_app_name = "#{url_prefix}-#{url_suffix}".downcase.chomp('-')[0..29] #heroku only allows upto 30 characters in name
 
       ENV['BRANCH_NAME'] = branch_name
       ENV['HEROKU_APP_NAME'] = heroku_app_name
-      @settings = ConfigLoader.new('push2heroku.yml').settings(branch_name)
+      ENV['HEROKU_APP_URL'] = "http://#{heroku_app_name}.herokuapp.com"
+
+      if app_url = @settings.app_url
+        ENV['APP_URL'] =  app_url
+      else
+        ENV['APP_URL'] =  ENV['HEROKU_APP_URL']
+      end
+
 
       @commands = []
     end
