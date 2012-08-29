@@ -123,7 +123,11 @@ module Push2heroku
       return unless settings.config
       cmd = []
       settings.config.each do |key, value|
-        cmd << "#{key.upcase}=#{value}" unless value.nil?
+        if String === value && !value.strip.empty?
+          cmd << "#{key.upcase}=#{value}"
+        else
+          cmd << "#{key.upcase}=#{value}"
+        end
       end
      commands << "bundle exec heroku config:add #{cmd.join(' ')} --app #{heroku_app_name}"
     end
