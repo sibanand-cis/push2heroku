@@ -61,3 +61,21 @@ is no longer a special branch and the heroku url would be
 ## License
 
 `push2heroku` is released under MIT License.
+
+The new design of `push2heroku` is very flexible. Let's say that Artem
+wants to test something then he can add to `push2heroku.yml` something
+like this
+
+```
+regenerate_images:
+  - bundle exec heroku run rake db:regenerate_images --app <%=ENV['HEROKU_APP_NAME']%> --trace
+  - bundle exec heroku run rake db:post_image_cleanup --app <%=ENV['HEROKU_APP_NAME']%> --trace
+```
+
+Now to execute all the commands under key `regenrate_images` all he has to do is
+
+```
+rake push2heroku CALLBACKS=reset_db_using_fixtures,regenerate_images
+```
+
+Just comma separate all the tasks. It's that simple. Now `push2heroku` gives all the control to the developer.
