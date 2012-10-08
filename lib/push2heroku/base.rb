@@ -87,7 +87,7 @@ module Push2heroku
 
     def build_commands
       commands << settings.pre_config_commands
-      build_config_commands
+      build_config_environment_commands
       add_before_every_install
       add_callback_commands
       add_after_every_install
@@ -119,7 +119,7 @@ module Push2heroku
       end
     end
 
-    def build_config_commands
+    def build_config_environment_commands
       return unless settings.config
       cmd = []
       settings.config.each do |key, value|
