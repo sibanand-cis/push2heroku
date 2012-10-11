@@ -2,13 +2,14 @@ module Push2heroku
   class Base
 
     attr_accessor :branch_name, :commands, :current_user, :settings, :named_branches
-    attr_reader :callbacks, :project_name, :heroku_app_name, :git, :config
+    attr_reader :callbacks, :project_name, :heroku_app_name, :git, :config, :config_file
 
-    def initialize(callbacks)
+    def initialize(config_path, callbacks)
       @callbacks = callbacks
       @git = Git.new
       @commands = []
-      @config = ConfigLoader.new('push2heroku.yml')
+      @config_file = File.join(config_path, 'push2heroku.yml')
+      @config = ConfigLoader.new(@config_file)
       after_initialize
     end
 
@@ -24,7 +25,7 @@ module Push2heroku
     end
 
     def reload_config
-      @config = ConfigLoader.new('push2heroku.yml')
+      @config = ConfigLoader.new(config_file)
       set_settings
     end
 
@@ -64,10 +65,7 @@ module Push2heroku
       feedback_to_user
       commands.each_with_index do |cmd, index|
         puts "Going to execute: #{cmd}"
-        sh cmd do |ok, result|
-          puts "command #{cmd} failed" if (!ok && index > 0)
-          #abort "command #{cmd} failed" if (!ok && index > 0)
-        end
+        puts "command #{cmd} failed" if !system(cmd) && index > 0
       end
     end
 
