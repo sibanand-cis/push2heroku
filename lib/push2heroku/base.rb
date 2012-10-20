@@ -62,10 +62,14 @@ module Push2heroku
     def push
       build_commands
       feedback_to_user
-      commands.each do |cmd|
+      commands.each_with_index do |cmd, index|
         begin
           puts "Going to execute: #{cmd}"
-          sh cmd
+          sh cmd do |ok, result|
+            if !ok && index > 0
+              abort "command #{cmd} failed"
+            end
+          end
         rescue Exception => e
           puts "command that failed was: #{cmd}"
           puts e
