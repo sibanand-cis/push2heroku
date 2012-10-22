@@ -65,7 +65,8 @@ module Push2heroku
       commands.each_with_index do |cmd, index|
         puts "Going to execute: #{cmd}"
         sh cmd do |ok, result|
-          abort "command #{cmd} failed" if (!ok && index > 0)
+          puts "command #{cmd} failed" if (!ok && index > 0)
+          #abort "command #{cmd} failed" if (!ok && index > 0)
         end
       end
     end
