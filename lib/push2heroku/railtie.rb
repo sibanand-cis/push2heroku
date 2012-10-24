@@ -14,11 +14,11 @@ module Push2heroku
       end
 
       desc "pushes to heroku via external server"
-      task :push2hpusher, [:project, :branch, :host] do |t, args|
-        unless args[:project] && args[:branch] && args[:host]
-          puts "Usage: rake push2server['tweli','master','hpusher.com'] CALLBACKS=reset_db_using_fixtures"
+      task :push2hpusher, [:project, :branch] do |t, args|
+        unless args[:project] && args[:branch]
+          puts "Usage: rake push2server['tweli','master'] CALLBACKS=reset_db_using_fixtures"
         end
-        host_url = ['http://', args[:host], '/heroku'].join
+        host_url = ['http://74.207.237.77/heroku'].join
         response = Net::HTTP.post_form(URI.parse(host_url), {project: args[:project], branch: args[:branch], 'options[callbacks]' => ENV['CALLBACKS']})
         if response.code == '200'
           puts 'The appliction will be deployed to:'
