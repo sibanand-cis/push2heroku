@@ -30,6 +30,5 @@ module Push2heroku
       YAML.load(ERB.new(File.read(filename)).result)
     end
 
-
   end
 end

@@ -13,6 +13,17 @@ module Push2heroku
       after_initialize
     end
 
+    def push
+      build_commands
+      feedback_to_user
+      commands.each_with_index do |cmd, index|
+        puts "Going to execute: #{cmd}"
+        puts "command #{cmd} failed" if !system(cmd) && index > 0
+      end
+    end
+
+    private
+
     def after_initialize
       set_project_name
       set_branch_name
@@ -24,17 +35,11 @@ module Push2heroku
       reload_config
     end
 
-    def reload_config
-      @config = ConfigLoader.new(config_file)
-      set_settings
-    end
-
-    def set_project_name
-      @project_name = File.basename(Dir.getwd)
-    end
-
-    def set_branch_name
-      @branch_name = git.current_branch
+    def set_env
+      ENV['BRANCH_NAME'] = branch_name
+      ENV['HEROKU_APP_NAME'] = heroku_app_name
+      ENV['HEROKU_APP_URL'] = "http://#{heroku_app_name}.herokuapp.com"
+      ENV['APP_URL'] = @settings.app_url ? @settings.app_url : ENV['HEROKU_APP_URL']
     end
 
     def set_current_user_name
@@ -53,23 +58,14 @@ module Push2heroku
       @heroku_app_name = "#{url_prefix}-#{url_suffix}".downcase.chomp('-')[0..29] #heroku only allows upto 30 characters in name
     end
 
-    def set_env
-      ENV['BRANCH_NAME'] = branch_name
-      ENV['HEROKU_APP_NAME'] = heroku_app_name
-      ENV['HEROKU_APP_URL'] = "http://#{heroku_app_name}.herokuapp.com"
-      ENV['APP_URL'] = @settings.app_url ? @settings.app_url : ENV['HEROKU_APP_URL']
+    def reload_config
+      @config = ConfigLoader.new(config_file)
+      set_settings
     end
 
-    def push
-      build_commands
-      feedback_to_user
-      commands.each_with_index do |cmd, index|
-        puts "Going to execute: #{cmd}"
-        puts "command #{cmd} failed" if !system(cmd) && index > 0
-      end
+    def set_project_name
+      @project_name = File.basename(Dir.getwd)
     end
-
-    private
 
     def url_suffix
       return branch_name if named_branches.include?(branch_name)

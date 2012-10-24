@@ -57,10 +57,7 @@ However if I delete `staging` key from `push2heroku.yml` then `staging`
 is no longer a special branch and the heroku url would be
 `http://nimbleshop-staging-neeraj.herokuapp.com` .
 
-
-## License
-
-`push2heroku` is released under MIT License.
+## Callbacks
 
 The new design of `push2heroku` is very flexible. Let's say that Artem
 wants to test something then he can add to `push2heroku.yml` something
@@ -79,3 +76,8 @@ rake push2heroku CALLBACKS=reset_db_using_fixtures,regenerate_images
 ```
 
 Just comma separate all the tasks. It's that simple. Now `push2heroku` gives all the control to the developer.
+
+## License
+
+`push2heroku` is released under MIT License.
+
