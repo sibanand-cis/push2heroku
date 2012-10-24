@@ -14,14 +14,13 @@ module Push2heroku
       end
 
       desc "pushes to heroku via external server"
-      task :push2server, [:project, :branch, :callbacks, :host] do |t, args|
-        args.with_defaults(host: 'http://ec2-23-20-192-49.compute-1.amazonaws.com/heroku', project: 't-ec2', branch: 'master')
-        response = Net::HTTP.post_form(URI.parse(args[:host]), {project: args[:project], branch: args[:branch], 'options[callbacks]' => args[:callbacks]})
+      task :push2hpusher, [:project, :branch, :host] do |t, args|
+        response = Net::HTTP.post_form(URI.parse(args[:host]), {project: args[:project], branch: args[:branch], 'options[callbacks]' => ENV['CALLBACKS']})
         if response.code == '200'
-          puts 'You will deploy to:'
+          puts 'The appliction will be deployed to:'
           puts MultiJson.load(response.body)['heroku_url']
         else
-          puts 'Something goes wrong'
+          puts 'Something has gone wrong'
         end
       end
     end
