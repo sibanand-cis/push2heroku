@@ -5,7 +5,8 @@ module Push2heroku
       desc "pushes to heroku"
       task :push2heroku => :environment do
         callbacks = (ENV['CALLBACKS'] || '').split(',')
-        Base.new(callbacks).push
+        config_path = Rails.root.join('config')
+        Base.new(config_path, callbacks).push
       end
     end
 
