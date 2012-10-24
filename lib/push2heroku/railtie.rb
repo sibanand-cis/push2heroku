@@ -6,6 +6,8 @@ module Push2heroku
       require 'uri'
       require 'multi_json'
 
+      HPUSHER_URL = 'http://74.207.237.77/heroku'
+
       desc "pushes to heroku"
       task :push2heroku => :environment do
         callbacks = (ENV['CALLBACKS'] || '').split(',')
@@ -18,8 +20,7 @@ module Push2heroku
         unless args[:project] && args[:branch]
           puts "Usage: rake push2server['tweli','master'] CALLBACKS=reset_db_using_fixtures"
         end
-        host_url = ['http://74.207.237.77/heroku'].join
-        response = Net::HTTP.post_form(URI.parse(host_url), {project: args[:project], branch: args[:branch], 'options[callbacks]' => ENV['CALLBACKS']})
+        response = Net::HTTP.post_form(URI.parse(HPUSHER_URL), {project: args[:project], branch: args[:branch], 'options[callbacks]' => ENV['CALLBACKS']})
         if response.code == '200'
           puts 'The appliction will be deployed to:'
           puts MultiJson.load(response.body)['heroku_url']
