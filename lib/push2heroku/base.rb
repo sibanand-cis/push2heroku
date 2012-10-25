@@ -1,10 +1,13 @@
+require "open3"
+
 module Push2heroku
   class Base
 
-    attr_accessor :branch_name, :commands, :current_user, :settings, :named_branches
+    attr_accessor :branch_name, :commands, :current_user, :settings, :named_branches, :job
     attr_reader :callbacks, :project_name, :heroku_app_name, :git, :config, :config_file
 
-    def initialize(config_path, callbacks)
+    def initialize(job_id, config_path, callbacks)
+      @job = ::Job.find_by_id! job_id
       @callbacks = callbacks
       @git = Git.new
       @commands = []
@@ -17,8 +20,16 @@ module Push2heroku
       build_commands
       feedback_to_user
       commands.each_with_index do |cmd, index|
-        puts "Going to execute: #{cmd}"
-        puts "command #{cmd} failed" if !system(cmd) && index > 0
+        job.add_log("Going to execute: #{cmd}")
+        Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thr|
+          job.add_log(stdout.read)
+          exit_status = wait_thr.value
+          if !exit_status.success? && index >0
+            msg = "command #{cmd} failed"
+            job.add_log(msg)
+            abort msg
+          end
+        end
       end
     end
 
@@ -33,6 +44,10 @@ module Push2heroku
       set_heroku_app_name
       set_env
       reload_config
+    end
+
+    def set_branch_name
+      @branch_name = git.current_branch
     end
 
     def set_env

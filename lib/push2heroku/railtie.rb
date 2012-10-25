@@ -12,7 +12,7 @@ module Push2heroku
       task :push2heroku => :environment do
         callbacks = (ENV['CALLBACKS'] || '').split(',')
         config_path = Rails.root.join('config')
-        Base.new(config_path, callbacks).push
+        Base.new(::Job.create!.id, config_path, callbacks).push
       end
 
       desc "pushes to heroku via external server"
