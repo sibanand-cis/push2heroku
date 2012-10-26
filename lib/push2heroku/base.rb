@@ -86,7 +86,9 @@ module Push2heroku
     def url_suffix
       return branch_name if named_branches.include?(branch_name)
 
-      [branch_name[0..10], current_user[0..5]].join('-').gsub(/[^0-9a-zA-Z]+/,'-').downcase
+      u = current_user || 'hpusher'
+
+      [branch_name[0..10], u[0..5]].join('-').gsub(/[^0-9a-zA-Z]+/,'-').downcase
     end
 
     def url_prefix
