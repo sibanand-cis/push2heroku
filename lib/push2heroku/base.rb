@@ -13,6 +13,8 @@ module Push2heroku
       @commands = []
       @config_file = File.join(config_path, 'push2heroku.yml')
       @config = ConfigLoader.new(@config_file)
+      @project_name = @job.project_name
+      @branch_name = @job.branch_name
       after_initialize
     end
 
@@ -20,15 +22,24 @@ module Push2heroku
       build_commands
       feedback_to_user
       commands.each_with_index do |cmd, index|
-        job.add_log("Going to execute: #{cmd}")
+        job.add_log("executing: #{cmd} index is #{index}")
         Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thr|
           job.add_log(stdout.read)
+          job.add_log(stderr.read)
           exit_status = wait_thr.value
-          if !exit_status.success? && index >0
+
+          if !exit_status.success? && index == 0
+            cmd = "git remote add  h#{branch_name} git@heroku.com:#{heroku_app_name}.git"
+            job.add_log(cmd)
+            unless system(cmd)
+              raise "command #{cmd} failed"
+            end
+          elsif !exit_status.success? && index >0
             msg = "command #{cmd} failed"
             job.add_log(msg)
-            abort msg
+            raise msg
           end
+
         end
       end
     end
@@ -36,18 +47,12 @@ module Push2heroku
     private
 
     def after_initialize
-      set_project_name
-      set_branch_name
       set_current_user_name
       set_named_branches
       set_settings
       set_heroku_app_name
       set_env
       reload_config
-    end
-
-    def set_branch_name
-      @branch_name = git.current_branch
     end
 
     def set_env
@@ -76,10 +81,6 @@ module Push2heroku
     def reload_config
       @config = ConfigLoader.new(config_file)
       set_settings
-    end
-
-    def set_project_name
-      @project_name = File.basename(Dir.getwd)
     end
 
     def url_suffix
@@ -149,6 +150,7 @@ module Push2heroku
       puts 'Following commands will be executed:'
       commands.each do |cmd|
         puts cmd
+        job.add_log(cmd)
       end
       puts '='*50
       puts ''
